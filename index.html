@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>陈杨大冒险 - 10关挑战</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+#c{touch-action:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
+#c{display:block;width:100vw;height:100vh}
+.o{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:white;text-align:center;padding:20px}
+.o h2{font-size:36px;margin-bottom:20px;color:#ffd700}
+.b{background:#ff6b6b;color:white;border:none;padding:18px 50px;font-size:22px;border-radius:30px;cursor:pointer;margin:15px}
+.h{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="s" class="o"><h2>陈杨大冒险10关</h2><p>左下角摇杆移动，右下角跳跃<br>踩踏敌人头部可以攻击敌人<br>小心尖刺、激光、锯片等机关！<br>注意碎裂平台和移动平台<br>建议横屏游玩</p><button class="b" onclick="g()">开始游戏</button></div>
+<div id="rotate" class="o h"><h2>请旋转手机</h2><p>横屏游玩体验更佳</p></div>
+<div id="o" class="o h"><h2>游戏结束</h2><p>得分:<span id="fs">0</span></p><button class="b" onclick="r()">重试</button></div>
+<div id="w" class="o h"><h2>恭喜通关!</h2><p>得分:<span id="ws">0</span></p><button class="b" onclick="r()">再玩</button></div>
+<script>
+const img=new Image();
+img.src='data:image/jpeg;base64,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';
+let imgLoaded=false;
+img.onload=()=>{imgLoaded=true};
+img.onerror=()=>{console.log("img load fail")};
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resize();
+window.addEventListener('resize',resize);
+
+// 视口大小（显示区域）
+const VW=800,VH=450;
+// 镜头位置
+let camX=0,camY=0;
+
+function getScale(){return Math.min(canvas.width/VW,canvas.height/VH)}
+function getOffset(){const s=getScale();return{x:(canvas.width-VW*s)/2,y:(canvas.height-VH*s)/2,scale:s}}
+
+// 更新镜头跟随玩家
+function updateCamera(levelW,levelH){
+    const targetX=player.x+player.w/2-VW/2;
+    const targetY=player.y+player.h/2-VH/2;
+    camX+=(targetX-camX)*0.1;
+    camY+=(targetY-camY)*0.1;
+    camX=Math.max(0,Math.min(levelW-VW,camX));
+    camY=Math.max(0,Math.min(levelH-VH,camY));
+}
+
+// 控制按钮使用屏幕坐标
+function getControlPos(){
+    const w=canvas.width,h=canvas.height;
+    const r=Math.min(w,h)*0.12;
+    return{
+        jsX:r+30,jsY:h-r-30,jsR:r,
+        jbX:w-r-30,jbY:h-r-30,jbR:r
+    };
+}
+const js={active:false,dx:0,dy:0,x:80,y:380,radius:50};
+const jb={x:720,y:380,radius:45,pressed:false};
+let gameState='start',score=0,lives=3,level=1;
+let bullets=[],particles=[];
+const player={x:50,y:320,vx:0,vy:0,w:35,h:35,grounded:false,facing:1,invincible:0};
+
+// 敌人类型: n-普通, e-精英, b-Boss, f-最终Boss, s-狙击手, c-冲刺者, t-炮塔, m-召唤师
+// 机关类型: spike-尖刺, moving-移动平台, crumble-碎裂平台, spring-弹簧, laser-激光, sawblade-锯片, fire-火焰
+
+const levels=[
+// 第1关 - 新手教程 (1200x500)
+{width:1200,height:500,
+ platforms:[
+    {x:0,y:450,w:300,h:50},{x:350,y:450,w:200,h:50},{x:200,y:370,w:100,h:20},
+    {x:400,y:320,w:120,h:20},{x:600,y:450,w:200,h:50},{x:700,y:350,w:100,h:20},
+    {x:850,y:280,w:100,h:20},{x:1000,y:450,w:200,h:50},{x:1050,y:350,w:100,h:20}
+ ],
+ enemies:[
+    {x:400,y:410,w:40,h:40,type:'n',dx:1,hp:1,maxHp:1},
+    {x:700,y:410,w:40,h:40,type:'n',dx:1.2,hp:1,maxHp:1},
+    {x:1050,y:310,w:40,h:40,type:'n',dx:1,hp:1,maxHp:1}
+ ],
+ hazards:[
+    {type:'spike',x:550,y:435,w:50,h:15}
+ ],
+ springs:[{x:850,y:260,w:30,h:20,power:-18}],
+ goal:{x:1150,y:400,w:40,h:50}},
+
+// 第2关 - 跳跃挑战 (1500x600)
+{width:1500,height:600,
+ platforms:[
+    {x:0,y:550,w:200,h:50},{x:250,y:480,w:80,h:20},{x:380,y:420,w:80,h:20},
+    {x:500,y:360,w:100,h:20},{x:650,y:300,w:80,h:20},{x:780,y:360,w:100,h:20},
+    {x:930,y:420,w:80,h:20},{x:1050,y:480,w:100,h:20},{x:1200,y:550,w:150,h:50},
+    {x:1100,y:350,w:80,h:20},{x:1250,y:280,w:100,h:20},{x:1400,y:550,w:100,h:50}
+ ],
+ movingPlatforms:[
+    {x:300,y:550,w:100,h:20,dx:0,dy:-2,minY:400,maxY:550},
+    {x:850,y:300,w:80,h:20,dx:2,dy:0,minX:800,maxX:950}
+ ],
+ enemies:[
+    {x:500,y:320,w:45,h:45,type:'e',dx:1.5,hp:2,maxHp:2},
+    {x:1100,y:310,w:45,h:45,type:'n',dx:1,hp:1,maxHp:1},
+    {x:1250,y:240,w:50,h:50,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true}
+ ],
+ hazards:[
+    {type:'spike',x:420,y:405,w:60,h:15},{type:'spike',x:680,y:285,w:40,h:15}
+ ],
+ springs:[{x:200,y:530,w:30,h:20,power:-20}],
+ goal:{x:1420,y:500,w:40,h:50}},
+
+// 第3关 - 危险地带 (1800x600)
+{width:1800,height:600,
+ platforms:[
+    {x:0,y:550,w:250,h:50},{x:300,y:550,w:100,h:50},{x:450,y:480,w:100,h:20},
+    {x:600,y:550,w:150,h:50},{x:800,y:480,w:80,h:20},{x:920,y:400,w:100,h:20},
+    {x:1070,y:320,w:100,h:20},{x:1220,y:400,w:80,h:20},{x:1350,y:480,w:100,h:20},
+    {x:1500,y:550,w:150,h:50},{x:1700,y:550,w:100,h:50}
+ ],
+ movingPlatforms:[
+    {x:700,y:550,w:80,h:20,dx:0,dy:-3,minY:350,maxY:550}
+ ],
+ crumblePlatforms:[
+    {x:1000,y:550,w:80,h:20,timer:0,crumbling:false,gone:false}
+ ],
+ enemies:[
+    {x:350,y:510,w:40,h:40,type:'n',dx:1,hp:1,maxHp:1},
+    {x:620,y:510,w:50,h:50,type:'c',dx:2,hp:2,maxHp:2},
+    {x:1070,y:280,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1520,y:510,w:45,h:45,type:'e',dx:1.5,hp:2,maxHp:2}
+ ],
+ hazards:[
+    {type:'spike',x:400,y:535,w:50,h:15},{type:'spike',x:750,y:535,w:50,h:15},
+    {type:'fire',x:1150,y:520,w:60,h:30,timer:0}
+ ],
+ sawblades:[{x:550,y:400,r:25,angle:0,cx:550,cy:400,orbitR:80}],
+ goal:{x:1720,y:500,w:40,h:50}},
+
+// 第4关 - 激光迷宫 (2000x700)
+{width:2000,height:700,
+ platforms:[
+    {x:0,y:650,w:200,h:50},{x:250,y:580,w:100,h:20},{x:400,y:650,w:150,h:50},
+    {x:600,y:580,w:100,h:20},{x:750,y:500,w:100,h:20},{x:900,y:420,w:100,h:20},
+    {x:1050,y:500,w:80,h:20},{x:1180,y:580,w:100,h:20},{x:1330,y:650,w:150,h:50},
+    {x:1530,y:580,w:100,h:20},{x:1680,y:500,w:100,h:20},{x:1830,y:650,w:170,h:50}
+ ],
+ movingPlatforms:[
+    {x:200,y:500,w:80,h:20,dx:2,dy:0,minX:200,maxX:350},
+    {x:1400,y:420,w:80,h:20,dx:0,dy:2,minY:350,maxY:500}
+ ],
+ lasers:[
+    {x:550,y:300,angle:Math.PI/2,length:250,on:true,timer:0,onTime:120,offTime:60},
+    {x:1000,y:200,angle:Math.PI/2,length:300,on:false,timer:60,onTime:90,offTime:90},
+    {x:1600,y:250,angle:Math.PI/2,length:300,on:true,timer:30,onTime:100,offTime:80}
+ ],
+ enemies:[
+    {x:420,y:610,w:45,h:45,type:'c',dx:2,hp:2,maxHp:2},
+    {x:760,y:460,w:50,h:50,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true},
+    {x:1350,y:610,w:50,h:50,type:'e',dx:1.8,hp:2,maxHp:2},
+    {x:1700,y:460,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true}
+ ],
+ hazards:[
+    {type:'spike',x:300,y:635,w:80,h:15},{type:'spike',x:1250,y:565,w:60,h:15}
+ ],
+ springs:[{x:900,y:400,w:30,h:20,power:-22}],
+ goal:{x:1900,y:600,w:40,h:50}},
+
+// 第5关 - 碎裂危机 (2200x700)
+{width:2200,height:700,
+ platforms:[
+    {x:0,y:650,w:200,h:50},{x:350,y:650,w:100,h:50},{x:550,y:580,w:80,h:20},
+    {x:700,y:500,w:100,h:20},{x:900,y:420,w:100,h:20},{x:1100,y:340,w:100,h:20},
+    {x:1300,y:420,w:80,h:20},{x:1450,y:500,w:100,h:20},{x:1600,y:580,w:80,h:20},
+    {x:1750,y:650,w:100,h:50},{x:2000,y:650,w:200,h:50}
+ ],
+ crumblePlatforms:[
+    {x:250,y:580,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:800,y:580,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1000,y:500,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1200,y:500,w:80,h:20,timer:0,crumbling:false,gone:false}
+ ],
+ movingPlatforms:[
+    {x:450,y:650,w:80,h:20,dx:0,dy:-3,minY:450,maxY:650},
+    {x:1850,y:500,w:100,h:20,dx:0,dy:2,minY:400,maxY:600}
+ ],
+ enemies:[
+    {x:550,y:540,w:45,h:45,type:'n',dx:1,hp:1,maxHp:1},
+    {x:900,y:380,w:50,h:50,type:'e',dx:1.5,hp:2,maxHp:2},
+    {x:1100,y:300,w:55,h:55,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true},
+    {x:1770,y:610,w:50,h:50,type:'c',dx:2,hp:2,maxHp:2}
+ ],
+ hazards:[
+    {type:'spike',x:300,y:635,w:50,h:15},{type:'spike',x:1680,y:565,w:60,h:15},
+    {type:'fire',x:1550,y:620,w:50,h:30,timer:0}
+ ],
+ sawblades:[
+    {x:650,y:350,r:30,angle:0,cx:650,cy:350,orbitR:100},
+    {x:1400,y:300,r:25,angle:Math.PI,cx:1400,cy:300,orbitR:80}
+ ],
+ goal:{x:2100,y:600,w:40,h:50}},
+
+// 第6关 - 炮塔地狱 (2400x750)
+{width:2400,height:750,
+ platforms:[
+    {x:0,y:700,w:200,h:50},{x:280,y:630,w:100,h:20},{x:450,y:700,w:150,h:50},
+    {x:680,y:630,w:80,h:20},{x:840,y:560,w:100,h:20},{x:1020,y:480,w:100,h:20},
+    {x:1200,y:400,w:100,h:20},{x:1380,y:480,w:80,h:20},{x:1540,y:560,w:100,h:20},
+    {x:1720,y:630,w:80,h:20},{x:1880,y:700,w:150,h:50},{x:2100,y:630,w:100,h:20},
+    {x:2250,y:700,w:150,h:50}
+ ],
+ movingPlatforms:[
+    {x:150,y:550,w:80,h:20,dx:2,dy:0,minX:150,maxX:350},
+    {x:600,y:700,w:80,h:20,dx:0,dy:-3,minY:500,maxY:700},
+    {x:2000,y:550,w:80,h:20,dx:0,dy:2,minY:450,maxY:650}
+ ],
+ enemies:[
+    {x:470,y:660,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1020,y:440,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1200,y:360,w:55,h:55,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true},
+    {x:1540,y:520,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1900,y:660,w:50,h:50,type:'e',dx:1.8,hp:2,maxHp:2}
+ ],
+ hazards:[
+    {type:'spike',x:380,y:685,w:60,h:15},{type:'spike',x:760,y:615,w:60,h:15},
+    {type:'spike',x:1280,y:685,w:60,h:15},{type:'fire',x:950,y:670,w:60,h:30,timer:0}
+ ],
+ lasers:[
+    {x:1100,y:200,angle:Math.PI/2,length:260,on:true,timer:0,onTime:100,offTime:80}
+ ],
+ springs:[{x:1380,y:460,w:30,h:20,power:-20}],
+ goal:{x:2300,y:650,w:40,h:50}},
+
+// 第7关 - Boss守卫 (2000x700)
+{width:2000,height:700,
+ platforms:[
+    {x:0,y:650,w:250,h:50},{x:350,y:580,w:100,h:20},{x:520,y:500,w:100,h:20},
+    {x:700,y:650,w:200,h:50},{x:980,y:580,w:100,h:20},{x:1150,y:500,w:100,h:20},
+    {x:1320,y:420,w:120,h:20},{x:1520,y:500,w:100,h:20},{x:1700,y:650,w:300,h:50}
+ ],
+ movingPlatforms:[
+    {x:250,y:650,w:80,h:20,dx:0,dy:-3,minY:450,maxY:650},
+    {x:600,y:420,w:80,h:20,dx:2,dy:0,minX:500,maxX:700}
+ ],
+ enemies:[
+    {x:750,y:610,w:70,h:70,type:'b',dx:1.5,hp:5,maxHp:5,shoot:true},
+    {x:520,y:460,w:45,h:45,type:'c',dx:2,hp:2,maxHp:2},
+    {x:1150,y:460,w:50,h:50,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true},
+    {x:1800,y:610,w:45,h:45,type:'e',dx:1.8,hp:2,maxHp:2}
+ ],
+ hazards:[
+    {type:'spike',x:450,y:635,w:60,h:15},{type:'spike',x:900,y:635,w:80,h:15},
+    {type:'fire',x:1250,y:620,w:60,h:30,timer:0}
+ ],
+ sawblades:[{x:1400,y:300,r:30,angle:0,cx:1400,cy:300,orbitR:100}],
+ springs:[{x:1320,y:400,w:30,h:20,power:-18}],
+ goal:{x:1900,y:600,w:40,h:50}},
+
+// 第8关 - 召唤师巢穴 (2500x800)
+{width:2500,height:800,
+ platforms:[
+    {x:0,y:750,w:200,h:50},{x:280,y:680,w:100,h:20},{x:460,y:750,w:150,h:50},
+    {x:700,y:680,w:80,h:20},{x:860,y:600,w:100,h:20},{x:1050,y:520,w:100,h:20},
+    {x:1230,y:440,w:100,h:20},{x:1410,y:520,w:80,h:20},{x:1570,y:600,w:100,h:20},
+    {x:1750,y:680,w:80,h:20},{x:1910,y:750,w:150,h:50},{x:2150,y:680,w:100,h:20},
+    {x:2330,y:750,w:170,h:50}
+ ],
+ movingPlatforms:[
+    {x:180,y:600,w:80,h:20,dx:2,dy:0,minX:180,maxX:380},
+    {x:620,y:750,w:80,h:20,dx:0,dy:-4,minY:500,maxY:750},
+    {x:2050,y:600,w:80,h:20,dx:0,dy:2,minY:500,maxY:700}
+ ],
+ crumblePlatforms:[
+    {x:980,y:680,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1330,y:600,w:80,h:20,timer:0,crumbling:false,gone:false}
+ ],
+ enemies:[
+    {x:480,y:710,w:60,h:60,type:'m',dx:1,hp:5,maxHp:5},
+    {x:1050,y:480,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1230,y:400,w:55,h:55,type:'e',dx:1.5,hp:2,maxHp:2},
+    {x:1930,y:710,w:60,h:60,type:'m',dx:1,hp:5,maxHp:5}
+ ],
+ hazards:[
+    {type:'spike',x:380,y:735,w:70,h:15},{type:'spike',x:780,y:665,w:60,h:15},
+    {type:'fire',x:1500,y:720,w:60,h:30,timer:0},{type:'fire',x:2100,y:720,w:60,h:30,timer:0}
+ ],
+ lasers:[
+    {x:1150,y:200,angle:Math.PI/2,length:300,on:true,timer:0,onTime:90,offTime:90}
+ ],
+ sawblades:[
+    {x:900,y:350,r:30,angle:0,cx:900,cy:350,orbitR:120},
+    {x:1700,y:400,r:25,angle:Math.PI,cx:1700,cy:400,orbitR:80}
+ ],
+ goal:{x:2400,y:700,w:40,h:50}},
+
+// 第9关 - 地狱挑战 (3000x900)
+{width:3000,height:900,
+ platforms:[
+    {x:0,y:850,w:200,h:50},{x:300,y:780,w:80,h:20},{x:460,y:700,w:100,h:20},
+    {x:640,y:850,w:120,h:50},{x:850,y:780,w:80,h:20},{x:1010,y:700,w:80,h:20},
+    {x:1170,y:620,w:100,h:20},{x:1350,y:540,w:100,h:20},{x:1530,y:460,w:100,h:20},
+    {x:1710,y:540,w:80,h:20},{x:1870,y:620,w:100,h:20},{x:2050,y:700,w:80,h:20},
+    {x:2210,y:780,w:100,h:20},{x:2400,y:850,w:150,h:50},{x:2650,y:780,w:100,h:20},
+    {x:2850,y:850,w:150,h:50}
+ ],
+ movingPlatforms:[
+    {x:200,y:700,w:80,h:20,dx:2,dy:0,minX:200,maxX:380},
+    {x:760,y:850,w:80,h:20,dx:0,dy:-4,minY:600,maxY:850},
+    {x:1450,y:700,w:80,h:20,dx:0,dy:-2,minY:550,maxY:700},
+    {x:2550,y:700,w:80,h:20,dx:0,dy:2,minY:600,maxY:800}
+ ],
+ crumblePlatforms:[
+    {x:550,y:780,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1090,y:780,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1250,y:700,w:80,h:20,timer:0,crumbling:false,gone:false},
+    {x:1950,y:700,w:80,h:20,timer:0,crumbling:false,gone:false}
+ ],
+ enemies:[
+    {x:660,y:810,w:50,h:50,type:'c',dx:2.5,hp:2,maxHp:2},
+    {x:1170,y:580,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:1350,y:500,w:55,h:55,type:'s',dx:0.8,hp:2,maxHp:2,shoot:true},
+    {x:1530,y:420,w:55,h:55,type:'e',dx:2,hp:2,maxHp:2},
+    {x:2420,y:810,w:50,h:50,type:'t',dx:0,hp:3,maxHp:3,shoot:true},
+    {x:2870,y:810,w:50,h:50,type:'c',dx:2,hp:2,maxHp:2}
+ ],
+ hazards:[
+    {type:'spike',x:380,y:835,w:70,h:15},{type:'spike',x:930,y:765,w:60,h:15},
+    {type:'spike',x:1790,y:525,w:60,h:15},{type:'spike',x:2300,y:835,w:80,h:15},
+    {type:'fire',x:1100,y:820,w:60,h:30,timer:0},{type:'fire',x:2150,y:820,w:60,h:30,timer:0}
+ ],
+ lasers:[
+    {x:900,y:300,angle:Math.PI/2,length:400,on:true,timer:0,onTime:80,offTime:60},
+    {x:1650,y:200,angle:Math.PI/2,length:320,on:false,timer:40,onTime:70,offTime:70},
+    {x:2750,y:350,angle:Math.PI/2,length:400,on:true,timer:20,onTime:90,offTime:60}
+ ],
+ sawblades:[
+    {x:600,y:500,r:35,angle:0,cx:600,cy:500,orbitR:150},
+    {x:1900,y:350,r:30,angle:Math.PI,cx:1900,cy:350,orbitR:120}
+ ],
+ springs:[{x:1530,y:440,w:30,h:20,power:-25},{x:2650,y:760,w:30,h:20,power:-22}],
+ goal:{x:2920,y:800,w:40,h:50}},
+
+// 第10关 - 最终Boss (2000x800)
+{width:2000,height:800,
+ platforms:[
+    {x:0,y:750,w:300,h:50},{x:400,y:680,w:100,h:20},{x:600,y:600,w:120,h:20},
+    {x:820,y:520,w:100,h:20},{x:1020,y:440,w:150,h:20},{x:1270,y:520,w:100,h:20},
+    {x:1470,y:600,w:120,h:20},{x:1680,y:680,w:100,h:20},{x:1850,y:750,w:150,h:50},
+    {x:500,y:750,w:1200,h:50}
+ ],
+ movingPlatforms:[
+    {x:300,y:600,w:80,h:20,dx:0,dy:-2,minY:450,maxY:600},
+    {x:1600,y:450,w:80,h:20,dx:0,dy:2,minY:380,maxY:550}
+ ],
+ enemies:[
+    {x:900,y:650,w:100,h:100,type:'f',dx:2,hp:12,maxHp:12,shoot:true,phase:1}
+ ],
+ hazards:[
+    {type:'spike',x:550,y:735,w:80,h:15},{type:'spike',x:750,y:735,w:80,h:15},
+    {type:'spike',x:1100,y:735,w:80,h:15},{type:'spike',x:1300,y:735,w:80,h:15},
+    {type:'fire',x:650,y:720,w:60,h:30,timer:0},{type:'fire',x:1200,y:720,w:60,h:30,timer:0}
+ ],
+ lasers:[
+    {x:450,y:200,angle:Math.PI/2,length:450,on:true,timer:0,onTime:120,offTime:80},
+    {x:1550,y:200,angle:Math.PI/2,length:450,on:false,timer:60,onTime:120,offTime:80}
+ ],
+ sawblades:[
+    {x:350,y:400,r:35,angle:0,cx:350,cy:400,orbitR:120},
+    {x:1650,y:400,r:35,angle:Math.PI,cx:1650,cy:400,orbitR:120}
+ ],
+ springs:[{x:1020,y:420,w:30,h:20,power:-20}],
+ goal:{x:1900,y:700,w:40,h:50,hidden:true}}
+];
+
+let currentLevel=null;
+let enemies=[];
+let movingPlatforms=[];
+let crumblePlatforms=[];
+let lasers=[];
+let sawblades=[];
+let springs=[];
+let hazards=[];
+
+function initLevel(l){
+    currentLevel=JSON.parse(JSON.stringify(levels[l-1]));
+    enemies=currentLevel.enemies.map(e=>({
+        ...e,
+        shootTimer:0,
+        face:-1,
+        chargeTimer:0,
+        isCharging:false,
+        chargeDx:0,
+        summonTimer:0,
+        attackPhase:0,
+        phaseTimer:0,
+        specialTimer:0,
+        originalX:e.x,
+        originalY:e.y,
+        vy:0
+    }));
+    movingPlatforms=(currentLevel.movingPlatforms||[]).map(p=>({...p,originalX:p.x,originalY:p.y}));
+    crumblePlatforms=(currentLevel.crumblePlatforms||[]).map(p=>({...p}));
+    lasers=(currentLevel.lasers||[]).map(l=>({...l}));
+    sawblades=(currentLevel.sawblades||[]).map(s=>({...s}));
+    springs=(currentLevel.springs||[]).map(s=>({...s,triggered:false,animTimer:0}));
+    hazards=(currentLevel.hazards||[]).map(h=>({...h}));
+    
+    player.x=50;
+    player.y=currentLevel.height-150;
+    player.vx=0;
+    player.vy=0;
+    camX=0;
+    camY=currentLevel.height-VH;
+    bullets=[];
+    particles=[];
+}
+
+// 计算两点之间的角度
+function angleToPlayer(e){
+    return Math.atan2(player.y+player.h/2-(e.y+e.h/2),player.x+player.w/2-(e.x+e.w/2));
+}
+
+// 计算两点距离
+function distToPlayer(e){
+    const dx=player.x+player.w/2-(e.x+e.w/2);
+    const dy=player.y+player.h/2-(e.y+e.h/2);
+    return Math.sqrt(dx*dx+dy*dy);
+}
+
+function drawEnemy(ctx,x,y,w,h,type,e,ox,oy,s){
+    const cx=x+w/2,cy=y+h/2,r=Math.min(w,h)/2;
+    
+    // 不同敌人类型的边框颜色
+    const borderColors={
+        'n':'#f39c12', // 普通-黄色
+        'e':'#e74c3c', // 精英-红色
+        's':'#3498db', // 狙击-蓝色
+        'c':'#e67e22', // 冲刺-橙色
+        't':'#1abc9c', // 炮塔-青色
+        'm':'#9b59b6', // 召唤-紫色
+        'b':'#8e44ad', // Boss-深紫
+        'f':'#c0392b'  // 最终Boss-深红
+    };
+    
+    // 冲刺时的特效
+    if(e.isCharging){
+        ctx.fillStyle='rgba(255,0,0,0.4)';
+        ctx.beginPath();
+        ctx.arc(cx,cy,r*1.5,0,Math.PI*2);
+        ctx.fill();
+        // 冲刺方向指示
+        ctx.strokeStyle='#f00';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+e.chargeDx*5,cy);
+        ctx.stroke();
+    }
+    
+    // 冲刺准备警告(chargeTimer > 40时)
+    if(type==='c'&&!e.isCharging&&e.chargeTimer>40){
+        const warningAlpha=0.3+Math.sin(Date.now()/50)*0.3;
+        ctx.fillStyle='rgba(255,255,0,'+warningAlpha+')';
+        ctx.beginPath();
+        ctx.arc(cx,cy,r*1.3,0,Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle='#ff0';
+        ctx.font='bold 14px Arial';
+        ctx.textAlign='center';
+        ctx.fillText('!',cx,y-35);
+    }
+    
+    // 最终Boss狂暴状态特效
+    if(type==='f'&&e.hp<=e.maxHp/2){
+        ctx.fillStyle='rgba(192,57,43,'+(0.3+Math.sin(Date.now()/100)*0.2)+')';
+        ctx.beginPath();
+        ctx.arc(cx,cy,r*1.3,0,Math.PI*2);
+        ctx.fill();
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+
+    if(imgLoaded){
+        ctx.drawImage(img,0,0,img.width,img.height,x,y,w,h);
+    }else{
+        const colors={'n':'#f39c12','e':'#e74c3c','s':'#3498db','c':'#e67e22','t':'#1abc9c','m':'#9b59b6','b':'#8e44ad','f':'#2c3e50'};
+        ctx.fillStyle=colors[type]||'#e74c3c';
+        ctx.fillRect(x,y,w,h);
+        ctx.fillStyle='white';
+        ctx.font='bold '+(h*0.4)+'px Arial';
+        ctx.textAlign='center';
+        ctx.fillText('陈',x+w/2,y+h*0.65);
+    }
+    ctx.restore();
+    
+    // 边框
+    ctx.strokeStyle=borderColors[type]||'#ff0';
+    ctx.lineWidth=type==='f'?4:type==='b'?3:2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.stroke();
+    
+    // 敌人类型标识
+    const typeNames={'n':'兵','e':'将','s':'狙','c':'冲','t':'塔','m':'召','b':'帅','f':'王'};
+    ctx.fillStyle='rgba(0,0,0,0.7)';
+    ctx.beginPath();
+    ctx.arc(cx,y-15,10,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 12px Arial';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(typeNames[type]||'?',cx,y-15);
+    
+    // 血条
+    const hpBarW=w,hpBarH=6;
+    ctx.fillStyle='#333';
+    ctx.fillRect(x,y-28,hpBarW,hpBarH);
+    const hpRatio=e.hp/e.maxHp;
+    ctx.fillStyle=hpRatio>0.5?'#2ecc71':hpRatio>0.25?'#f1c40f':'#e74c3c';
+    ctx.fillRect(x,y-28,hpBarW*hpRatio,hpBarH);
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=1;
+    ctx.strokeRect(x,y-28,hpBarW,hpBarH);
+}
+
+function drawBullet(b){
+    if(b.tracking){
+        // 追踪弹 - 橙色带尾迹
+        ctx.fillStyle='#ff6600';
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,6,0,Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle='rgba(255,102,0,0.5)';
+        ctx.beginPath();
+        ctx.arc(b.x-b.vx*0.5,b.y-b.vy*0.5,4,0,Math.PI*2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(b.x-b.vx,b.y-b.vy,3,0,Math.PI*2);
+        ctx.fill();
+    }else{
+        // 普通子弹 - 红色
+        ctx.fillStyle='#f00';
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,5,0,Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle='#ff6666';
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,2,0,Math.PI*2);
+        ctx.fill();
+    }
+}
+
+function drawParticles(){
+    for(let i=particles.length-1;i>=0;i--){
+        const p=particles[i];
+        p.life--;
+        p.x+=p.vx;
+        p.y+=p.vy;
+        ctx.fillStyle=p.color;
+        ctx.globalAlpha=p.life/30;
+        ctx.fillRect(p.x,p.y,p.size,p.size);
+        ctx.globalAlpha=1;
+        if(p.life<=0)particles.splice(i,1);
+    }
+}
+
+function createParticles(x,y,color,count=8){
+    for(let i=0;i<count;i++){
+        particles.push({
+            x:x,y:y,
+            vx:(Math.random()-0.5)*4,
+            vy:(Math.random()-0.5)*4,
+            life:30,color:color,size:Math.random()*6+2
+        });
+    }
+}
+
+function draw(){
+    ctx.fillStyle='#1a1a2e';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    const off=getOffset();
+    const s=off.scale;
+    const ox=off.x,oy=off.y;
+    const LW=currentLevel.width,LH=currentLevel.height;
+    
+    ctx.save();
+    ctx.translate(ox,oy);
+    ctx.scale(s,s);
+    
+    // 绘制背景
+    ctx.fillStyle='#16213e';
+    ctx.fillRect(0,0,VW,VH);
+    
+    // 应用镜头偏移
+    ctx.save();
+    ctx.translate(-camX,-camY);
+    
+    // 绘制背景网格
+    ctx.strokeStyle='rgba(255,255,255,0.05)';
+    ctx.lineWidth=1;
+    for(let x=0;x<LW;x+=100){
+        ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,LH);ctx.stroke();
+    }
+    for(let y=0;y<LH;y+=100){
+        ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(LW,y);ctx.stroke();
+    }
+    
+    // 绘制固定平台
+    ctx.fillStyle='#0f3460';
+    for(const p of currentLevel.platforms){
+        ctx.fillRect(p.x,p.y,p.w,p.h);
+        ctx.strokeStyle='#e94560';
+        ctx.lineWidth=2;
+        ctx.strokeRect(p.x,p.y,p.w,p.h);
+    }
+    
+    // 绘制移动平台
+    ctx.fillStyle='#1abc9c';
+    for(const p of movingPlatforms){
+        ctx.fillRect(p.x,p.y,p.w,p.h);
+        ctx.strokeStyle='#16a085';
+        ctx.lineWidth=2;
+        ctx.strokeRect(p.x,p.y,p.w,p.h);
+        // 移动指示箭头
+        ctx.fillStyle='rgba(255,255,255,0.5)';
+        ctx.font='12px Arial';
+        ctx.textAlign='center';
+        if(p.dx!==0)ctx.fillText('↔',p.x+p.w/2,p.y+p.h/2+4);
+        else ctx.fillText('↕',p.x+p.w/2,p.y+p.h/2+4);
+        ctx.fillStyle='#1abc9c';
+    }
+    
+    // 绘制碎裂平台
+    for(const p of crumblePlatforms){
+        if(p.gone)continue;
+        const shake=p.crumbling?Math.sin(Date.now()/20)*3:0;
+        ctx.fillStyle=p.crumbling?'#e74c3c':'#9b59b6';
+        ctx.fillRect(p.x+shake,p.y,p.w,p.h);
+        ctx.strokeStyle='#8e44ad';
+        ctx.lineWidth=2;
+        ctx.strokeRect(p.x+shake,p.y,p.w,p.h);
+        // 裂痕效果
+        if(p.crumbling){
+            ctx.strokeStyle='#c0392b';
+            ctx.beginPath();
+            ctx.moveTo(p.x+p.w*0.2,p.y);ctx.lineTo(p.x+p.w*0.4,p.y+p.h);
+            ctx.moveTo(p.x+p.w*0.6,p.y);ctx.lineTo(p.x+p.w*0.8,p.y+p.h);
+            ctx.stroke();
+        }
+    }
+    
+    // 绘制弹簧
+    for(const sp of springs){
+        const compressed=sp.animTimer>0;
+        const h=compressed?10:20;
+        ctx.fillStyle='#f1c40f';
+        ctx.fillRect(sp.x,sp.y+(20-h),sp.w,h);
+        ctx.fillStyle='#e67e22';
+        ctx.fillRect(sp.x+5,sp.y+(20-h),sp.w-10,5);
+        // 弹簧线圈
+        ctx.strokeStyle='#d35400';
+        ctx.lineWidth=2;
+        for(let i=0;i<3;i++){
+            ctx.beginPath();
+            ctx.moveTo(sp.x+5,sp.y+(20-h)+5+i*4);
+            ctx.lineTo(sp.x+sp.w-5,sp.y+(20-h)+5+i*4);
+            ctx.stroke();
+        }
+    }
+    
+    // 绘制尖刺
+    for(const h of hazards){
+        if(h.type==='spike'){
+            ctx.fillStyle='#c0392b';
+            const spikeCount=Math.floor(h.w/10);
+            for(let i=0;i<spikeCount;i++){
+                ctx.beginPath();
+                ctx.moveTo(h.x+i*10,h.y+h.h);
+                ctx.lineTo(h.x+i*10+5,h.y);
+                ctx.lineTo(h.x+i*10+10,h.y+h.h);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }else if(h.type==='fire'){
+            const flicker=Math.sin(Date.now()/50)*0.3+0.7;
+            ctx.fillStyle=`rgba(255,${Math.floor(100+50*flicker)},0,${flicker})`;
+            ctx.beginPath();
+            for(let i=0;i<h.w;i+=8){
+                const fh=h.h*(0.5+Math.sin(Date.now()/100+i)*0.5);
+                ctx.moveTo(h.x+i,h.y+h.h);
+                ctx.lineTo(h.x+i+4,h.y+h.h-fh);
+                ctx.lineTo(h.x+i+8,h.y+h.h);
+            }
+            ctx.fill();
+        }
+    }
+    
+    // 绘制锯片
+    for(const sb of sawblades){
+        ctx.save();
+        ctx.translate(sb.x,sb.y);
+        ctx.rotate(sb.angle);
+        ctx.fillStyle='#7f8c8d';
+        ctx.beginPath();
+        ctx.arc(0,0,sb.r,0,Math.PI*2);
+        ctx.fill();
+        // 锯齿
+        ctx.fillStyle='#95a5a6';
+        for(let i=0;i<8;i++){
+            ctx.save();
+            ctx.rotate(i*Math.PI/4);
+            ctx.beginPath();
+            ctx.moveTo(sb.r-5,-5);
+            ctx.lineTo(sb.r+8,0);
+            ctx.lineTo(sb.r-5,5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        ctx.fillStyle='#2c3e50';
+        ctx.beginPath();
+        ctx.arc(0,0,sb.r*0.3,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+    
+    // 绘制激光
+    for(const l of lasers){
+        if(l.on){
+            ctx.strokeStyle='rgba(255,0,0,0.8)';
+            ctx.lineWidth=6;
+            ctx.beginPath();
+            ctx.moveTo(l.x,l.y);
+            ctx.lineTo(l.x+Math.cos(l.angle)*l.length,l.y+Math.sin(l.angle)*l.length);
+            ctx.stroke();
+            // 激光核心
+            ctx.strokeStyle='rgba(255,200,200,0.9)';
+            ctx.lineWidth=2;
+            ctx.beginPath();
+            ctx.moveTo(l.x,l.y);
+            ctx.lineTo(l.x+Math.cos(l.angle)*l.length,l.y+Math.sin(l.angle)*l.length);
+            ctx.stroke();
+        }
+        // 激光发射器
+        ctx.fillStyle=l.on?'#e74c3c':'#7f8c8d';
+        ctx.beginPath();
+        ctx.arc(l.x,l.y,10,0,Math.PI*2);
+        ctx.fill();
+    }
+    
+    // 绘制终点
+    const g=currentLevel.goal;
+    if(!g.hidden){
+        ctx.fillStyle='#0f0';
+        ctx.fillRect(g.x,g.y,g.w,g.h);
+        ctx.fillStyle='#fff';
+        ctx.font='16px Arial';
+        ctx.textAlign='center';
+        ctx.fillText('出口',g.x+g.w/2,g.y+g.h/2+5);
+        ctx.strokeStyle='rgba(0,255,0,'+(0.5+Math.sin(Date.now()/200)*0.5)+')';
+        ctx.lineWidth=3;
+        ctx.strokeRect(g.x-2,g.y-2,g.w+4,g.h+4);
+    }
+    
+    // 绘制敌人
+    for(const e of enemies){
+        if(e.hp>0)drawEnemy(ctx,e.x,e.y,e.w,e.h,e.type,e,ox,oy,s);
+    }
+    
+    // 绘制子弹
+    for(const b of bullets)drawBullet(b);
+    drawParticles();
+    
+    // 绘制玩家
+    ctx.save();
+    ctx.translate(player.x+player.w/2,player.y+player.h/2);
+    if(player.facing<0)ctx.scale(-1,1);
+    ctx.fillStyle='#3498db';
+    ctx.beginPath();
+    ctx.arc(0,0,player.w/2,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#2980b9';
+    ctx.beginPath();
+    ctx.arc(-5,-5,5,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(player.w/2,0);
+    ctx.lineTo(player.w/2+8,-5);
+    ctx.lineTo(player.w/2+8,5);
+    ctx.closePath();
+    ctx.fillStyle='#f1c40f';
+    ctx.fill();
+    ctx.restore();
+    
+    if(player.invincible>0&&Math.floor(player.invincible/5)%2===0){
+        ctx.strokeStyle='#0ff';
+        ctx.lineWidth=3;
+        ctx.strokeRect(player.x,player.y,player.w,player.h);
+    }
+    
+    ctx.restore(); // 恢复镜头偏移
+    
+    // 绘制UI（固定在屏幕上）
+    ctx.fillStyle='#fff';
+    ctx.font='bold 22px Arial';
+    ctx.textAlign='left';
+    ctx.fillText('第'+level+'关',15,30);
+    ctx.fillText('生命:'+lives,15,55);
+    ctx.fillText('得分:'+score,15,80);
+    
+    const aliveEnemies=enemies.filter(e=>e.hp>0).length;
+    ctx.fillStyle=aliveEnemies>0?'#e74c3c':'#2ecc71';
+    ctx.font='bold 16px Arial';
+    ctx.fillText('敌人:'+aliveEnemies,15,102);
+    
+    const levelNames=['新手教程','跳跃挑战','危险地带','激光迷宫','碎裂危机',
+                      '炮塔地狱','Boss守卫','召唤师巢穴','地狱挑战','最终Boss'];
+    ctx.fillStyle='#ffd700';
+    ctx.font='bold 14px Arial';
+    ctx.textAlign='right';
+    ctx.fillText(levelNames[level-1]||'未知',VW-15,30);
+    
+    // 小地图
+    const mapW=120,mapH=60,mapX=VW-mapW-15,mapY=40;
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    ctx.fillRect(mapX,mapY,mapW,mapH);
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=1;
+    ctx.strokeRect(mapX,mapY,mapW,mapH);
+    // 视口范围
+    const scaleX=mapW/LW,scaleY=mapH/LH;
+    ctx.strokeStyle='#0ff';
+    ctx.strokeRect(mapX+camX*scaleX,mapY+camY*scaleY,VW*scaleX,VH*scaleY);
+    // 玩家位置
+    ctx.fillStyle='#3498db';
+    ctx.fillRect(mapX+player.x*scaleX-2,mapY+player.y*scaleY-2,4,4);
+    // 敌人位置
+    ctx.fillStyle='#e74c3c';
+    for(const e of enemies){
+        if(e.hp>0)ctx.fillRect(mapX+e.x*scaleX-1,mapY+e.y*scaleY-1,3,3);
+    }
+    // 终点位置
+    if(!g.hidden){
+        ctx.fillStyle='#0f0';
+        ctx.fillRect(mapX+g.x*scaleX-2,mapY+g.y*scaleY-2,4,4);
+    }
+    
+    // Boss关卡提示
+    if(g.hidden){
+        ctx.fillStyle='rgba(255,0,0,0.8)';
+        ctx.font='bold 16px Arial';
+        ctx.textAlign='center';
+        ctx.fillText('击败Boss解锁出口!',VW/2,50);
+    }
+
+    ctx.restore();
+
+    // 绘制控制按钮（使用屏幕坐标）
+    const cp=getControlPos();
+    ctx.globalAlpha=0.5;
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.arc(cp.jsX,cp.jsY,cp.jsR,0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.2)';
+    ctx.fill();
+    if(js.active){
+        ctx.beginPath();
+        ctx.arc(cp.jsX+js.dx*cp.jsR*0.7,cp.jsY+js.dy*cp.jsR*0.7,cp.jsR*0.4,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.6)';
+        ctx.fill();
+    }
+    ctx.fillStyle=jb.pressed?'rgba(255,107,107,0.8)':'rgba(255,107,107,0.4)';
+    ctx.beginPath();
+    ctx.arc(cp.jbX,cp.jbY,cp.jbR,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#fff';
+    ctx.stroke();
+    ctx.fillStyle='#fff';
+    ctx.font='bold '+Math.floor(cp.jbR*0.5)+'px Arial';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('跳',cp.jbX,cp.jbY);
+    ctx.globalAlpha=1;
+}
+
+function update(){
+    if(gameState!=='playing')return;
+    
+    const LW=currentLevel.width,LH=currentLevel.height;
+    
+    if(player.invincible>0)player.invincible--;
+    
+    // 更新移动平台
+    for(const p of movingPlatforms){
+        const oldX=p.x,oldY=p.y;
+        if(p.dx!==0){
+            p.x+=p.dx;
+            if(p.x<=p.minX||p.x+p.w>=p.maxX+p.w)p.dx=-p.dx;
+        }
+        if(p.dy!==0){
+            p.y+=p.dy;
+            if(p.y<=p.minY||p.y>=p.maxY)p.dy=-p.dy;
+        }
+        p.deltaX=p.x-oldX;
+        p.deltaY=p.y-oldY;
+    }
+    
+    // 更新碎裂平台
+    for(const p of crumblePlatforms){
+        if(p.gone)continue;
+        if(p.crumbling){
+            p.timer++;
+            if(p.timer>60){
+                p.gone=true;
+                createParticles(p.x+p.w/2,p.y+p.h/2,'#9b59b6',15);
+            }
+        }
+    }
+    
+    // 更新弹簧动画
+    for(const sp of springs){
+        if(sp.animTimer>0)sp.animTimer--;
+    }
+    
+    // 更新锯片
+    for(const sb of sawblades){
+        sb.angle+=0.1;
+        sb.x=sb.cx+Math.cos(sb.angle)*sb.orbitR;
+        sb.y=sb.cy+Math.sin(sb.angle*0.7)*sb.orbitR*0.5;
+    }
+    
+    // 更新激光
+    for(const l of lasers){
+        l.timer++;
+        if(l.on&&l.timer>=l.onTime){
+            l.on=false;
+            l.timer=0;
+        }else if(!l.on&&l.timer>=l.offTime){
+            l.on=true;
+            l.timer=0;
+        }
+    }
+    
+    // 玩家移动
+    const speed=4.5;
+    player.vx=js.active?js.dx*speed:0;
+    if(js.active&&js.dx!==0)player.facing=js.dx>0?1:-1;
+    
+    player.vy+=0.6;
+    player.x+=player.vx;
+    
+    // 所有平台的碰撞检测
+    const allPlatforms=[...currentLevel.platforms,...movingPlatforms,...crumblePlatforms.filter(p=>!p.gone)];
+    
+    for(const p of allPlatforms){
+        if(player.x<p.x+p.w&&player.x+player.w>p.x&&player.y+player.h>p.y&&player.y<p.y+p.h){
+            if(player.vx>0)player.x=p.x-player.w;
+            else if(player.vx<0)player.x=p.x+p.w;
+        }
+    }
+    
+    player.y+=player.vy;
+    player.grounded=false;
+    let onMovingPlatform=null;
+    
+    for(const p of allPlatforms){
+        if(player.x<p.x+p.w&&player.x+player.w>p.x&&player.y+player.h>p.y&&player.y<p.y+p.h){
+            if(player.vy>0&&player.y+player.h-player.vy<=p.y+5){
+                player.y=p.y-player.h;
+                player.vy=0;
+                player.grounded=true;
+                
+                // 检测是否在移动平台上
+                if(movingPlatforms.includes(p)){
+                    onMovingPlatform=p;
+                }
+                // 检测是否在碎裂平台上
+                if(crumblePlatforms.includes(p)&&!p.crumbling){
+                    p.crumbling=true;
+                    p.timer=0;
+                }
+                
+                if(jb.pressed){player.vy=-14;player.grounded=false}
+            }else if(player.vy<0&&player.y-player.vy>=p.y+p.h){
+                player.y=p.y+p.h;
+                player.vy=0;
+            }
+        }
+    }
+    
+    // 跟随移动平台
+    if(onMovingPlatform){
+        player.x+=onMovingPlatform.deltaX||0;
+        player.y+=onMovingPlatform.deltaY||0;
+    }
+    
+    // 弹簧检测
+    for(const sp of springs){
+        if(player.x<sp.x+sp.w&&player.x+player.w>sp.x&&
+           player.y+player.h>sp.y&&player.y+player.h<sp.y+25&&player.vy>0){
+            player.vy=sp.power;
+            sp.animTimer=10;
+            createParticles(sp.x+sp.w/2,sp.y,'#f1c40f',8);
+        }
+    }
+    
+    // 危险物检测
+    if(player.invincible<=0){
+        // 尖刺和火焰
+        for(const h of hazards){
+            if(player.x<h.x+h.w&&player.x+player.w>h.x&&
+               player.y<h.y+h.h&&player.y+player.h>h.y){
+                hurt();
+                return;
+            }
+        }
+        // 锯片
+        for(const sb of sawblades){
+            const dx=player.x+player.w/2-sb.x;
+            const dy=player.y+player.h/2-sb.y;
+            if(Math.sqrt(dx*dx+dy*dy)<sb.r+player.w/2-5){
+                hurt();
+                return;
+            }
+        }
+        // 激光
+        for(const l of lasers){
+            if(!l.on)continue;
+            // 简化的激光碰撞检测（垂直激光）
+            const lx=l.x,ly1=l.y,ly2=l.y+l.length;
+            if(player.x<lx+3&&player.x+player.w>lx-3&&
+               player.y<ly2&&player.y+player.h>ly1){
+                hurt();
+                return;
+            }
+        }
+    }
+    
+    // 边界检测
+    if(player.y>LH){hurt();return}
+    if(player.x<0)player.x=0;
+    if(player.x>LW-player.w)player.x=LW-player.w;
+    
+    // 更新镜头
+    updateCamera(LW,LH);
+    
+    for(const e of enemies){
+        if(e.hp<=0)continue;
+        
+        // 根据敌人类型执行不同AI
+        switch(e.type){
+            case 'n': // 普通敌人 - 来回走动
+                e.x+=e.dx;
+                if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                break;
+                
+            case 'e': // 精英敌人 - 跳跃追击
+                e.x+=e.dx;
+                if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                // 追踪玩家
+                if(player.x>e.x+50)e.dx=Math.abs(e.dx);
+                else if(player.x<e.x-50)e.dx=-Math.abs(e.dx);
+                // 跳跃
+                if(Math.random()<0.03&&e.vy===0){
+                    e.vy=-12;
+                }
+                break;
+                
+            case 's': // 狙击手 - 追踪弹
+                e.x+=e.dx;
+                if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                e.shootTimer++;
+                if(e.shootTimer>90){ // 每1.5秒发射追踪弹
+                    e.shootTimer=0;
+                    const angle=angleToPlayer(e);
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle)*4,vy:Math.sin(angle)*4,
+                        enemy:true,tracking:true,life:120
+                    });
+                    createParticles(e.x+e.w/2,e.y+e.h/2,'#ff0',5);
+                }
+                break;
+                
+            case 'c': // 冲刺者 - 冲向玩家
+                if(!e.isCharging){
+                    e.chargeTimer++;
+                    e.x+=e.dx*0.3; // 慢速移动
+                    if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                    // 准备冲刺
+                    if(e.chargeTimer>60&&distToPlayer(e)<400){
+                        e.isCharging=true;
+                        e.chargeTimer=0;
+                        e.chargeDx=(player.x>e.x?1:-1)*8;
+                        createParticles(e.x+e.w/2,e.y+e.h/2,'#f00',10);
+                    }
+                }else{
+                    e.x+=e.chargeDx;
+                    e.chargeTimer++;
+                    if(e.chargeTimer>30||e.x<=0||e.x+e.w>=LW){
+                        e.isCharging=false;
+                        e.chargeTimer=0;
+                        e.dx=e.chargeDx>0?1:-1;
+                    }
+                }
+                break;
+                
+            case 't': // 炮塔 - 定点扫射
+                e.shootTimer++;
+                e.specialTimer++;
+                // 三连发
+                if(e.shootTimer>40){
+                    e.shootTimer=0;
+                    e.attackPhase=(e.attackPhase+1)%8;
+                    const baseAngle=e.attackPhase*Math.PI/4;
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(baseAngle)*3,vy:Math.sin(baseAngle)*3,
+                        enemy:true
+                    });
+                }
+                // 偶尔向玩家射击
+                if(e.specialTimer>120){
+                    e.specialTimer=0;
+                    const angle=angleToPlayer(e);
+                    for(let i=-1;i<=1;i++){
+                        bullets.push({
+                            x:e.x+e.w/2,y:e.y+e.h/2,
+                            vx:Math.cos(angle+i*0.3)*4,vy:Math.sin(angle+i*0.3)*4,
+                            enemy:true
+                        });
+                    }
+                }
+                break;
+                
+            case 'm': // 召唤师 - 召唤小怪
+                e.x+=e.dx;
+                if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                e.summonTimer++;
+                // 每4秒召唤一个小怪
+                if(e.summonTimer>240&&enemies.filter(en=>en.hp>0).length<8){
+                    e.summonTimer=0;
+                    const newEnemy={
+                        x:e.x+(Math.random()-0.5)*100,
+                        y:e.y,
+                        w:35,h:35,
+                        type:'n',
+                        dx:(Math.random()>0.5?1:-1)*1.5,
+                        hp:1,maxHp:1,
+                        shootTimer:0,chargeTimer:0,isCharging:false,
+                        chargeDx:0,summonTimer:0,attackPhase:0,
+                        phaseTimer:0,specialTimer:0,vy:0
+                    };
+                    enemies.push(newEnemy);
+                    createParticles(e.x+e.w/2,e.y+e.h/2,'#9b59b6',15);
+                }
+                // 偶尔射击
+                if(Math.random()<0.01){
+                    const angle=angleToPlayer(e);
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle)*3,vy:Math.sin(angle)*3,
+                        enemy:true
+                    });
+                }
+                break;
+                
+            case 'b': // Boss - 多种攻击
+                e.x+=e.dx;
+                if(e.x<=0||e.x+e.w>=LW)e.dx=-e.dx;
+                e.shootTimer++;
+                e.phaseTimer++;
+                // 追踪玩家
+                if(player.x>e.x+30)e.dx=Math.abs(e.dx);
+                else if(player.x<e.x-30)e.dx=-Math.abs(e.dx);
+                // 跳跃
+                if(Math.random()<0.02&&e.vy===0)e.vy=-10;
+                // 普通射击
+                if(e.shootTimer>50){
+                    e.shootTimer=0;
+                    const dir=player.x>e.x?1:-1;
+                    bullets.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:dir*4,vy:0,enemy:true});
+                }
+                // 特殊攻击 - 散射
+                if(e.phaseTimer>180){
+                    e.phaseTimer=0;
+                    for(let i=-2;i<=2;i++){
+                        const angle=angleToPlayer(e)+i*0.4;
+                        bullets.push({
+                            x:e.x+e.w/2,y:e.y+e.h/2,
+                            vx:Math.cos(angle)*3,vy:Math.sin(angle)*3,
+                            enemy:true
+                        });
+                    }
+                    createParticles(e.x+e.w/2,e.y+e.h/2,'#9b59b6',10);
+                }
+                break;
+                
+            case 'f': // 最终Boss - 多阶段战斗
+                e.phaseTimer++;
+                e.shootTimer++;
+                e.specialTimer++;
+                
+                // 血量低于50%进入狂暴模式
+                const enraged=e.hp<=e.maxHp/2;
+                const speed=enraged?3:2;
+                
+                // 移动
+                e.x+=e.dx;
+                if(e.x<=50||e.x+e.w>=LW-50){
+                    e.dx=-e.dx;
+                }
+                // 追踪玩家
+                if(player.x>e.x+20)e.dx=Math.abs(speed);
+                else if(player.x<e.x-20)e.dx=-Math.abs(speed);
+                
+                // 跳跃
+                if(Math.random()<0.03&&e.vy===0)e.vy=-13;
+                
+                // 攻击模式1：快速射击
+                const shootInterval=enraged?20:35;
+                if(e.shootTimer>shootInterval){
+                    e.shootTimer=0;
+                    const angle=angleToPlayer(e);
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle)*5,vy:Math.sin(angle)*5,
+                        enemy:true
+                    });
+                }
+                
+                // 攻击模式2：环形弹幕
+                const burstInterval=enraged?120:180;
+                if(e.phaseTimer>burstInterval){
+                    e.phaseTimer=0;
+                    const bulletCount=enraged?12:8;
+                    for(let i=0;i<bulletCount;i++){
+                        const angle=i*Math.PI*2/bulletCount;
+                        bullets.push({
+                            x:e.x+e.w/2,y:e.y+e.h/2,
+                            vx:Math.cos(angle)*3,vy:Math.sin(angle)*3,
+                            enemy:true
+                        });
+                    }
+                    createParticles(e.x+e.w/2,e.y+e.h/2,'#2c3e50',20);
+                }
+                
+                // 攻击模式3：追踪弹幕（狂暴模式）
+                if(enraged&&e.specialTimer>90){
+                    e.specialTimer=0;
+                    const angle=angleToPlayer(e);
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle)*4,vy:Math.sin(angle)*4,
+                        enemy:true,tracking:true,life:150
+                    });
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle+0.5)*4,vy:Math.sin(angle+0.5)*4,
+                        enemy:true,tracking:true,life:150
+                    });
+                    bullets.push({
+                        x:e.x+e.w/2,y:e.y+e.h/2,
+                        vx:Math.cos(angle-0.5)*4,vy:Math.sin(angle-0.5)*4,
+                        enemy:true,tracking:true,life:150
+                    });
+                }
+                
+                // 显示终点（Boss血量低于25%）
+                if(e.hp<=e.maxHp/4&&currentLevel.goal.hidden){
+                    currentLevel.goal.hidden=false;
+                    createParticles(currentLevel.goal.x+20,currentLevel.goal.y+25,'#0f0',30);
+                }
+                break;
+        }
+        
+        // 通用重力和平台检测
+        let onPlatform=false;
+        for(const p of currentLevel.platforms){
+            if(e.x+e.w>p.x&&e.x<p.x+p.w&&e.y+e.h>=p.y&&e.y+e.h<=p.y+10){
+                onPlatform=true;
+                if(e.vy>0){
+                    e.y=p.y-e.h;
+                    e.vy=0;
+                }
+                break;
+            }
+        }
+        if(!onPlatform){
+            e.vy=(e.vy||0)+0.5;
+            e.y+=e.vy;
+        }
+        
+        // 碰撞检测
+        if(player.x<e.x+e.w&&player.x+player.w>e.x&&player.y<e.y+e.h&&player.y+player.h>e.y){
+            if(player.vy>0&&player.y+player.h-player.vy<=e.y+10){
+                e.hp--;
+                player.vy=-10;
+                score+=10;
+                createParticles(e.x+e.w/2,e.y+e.h/2,'#f1c40f',12);
+                if(e.hp<=0){
+                    const bonusScore={'f':200,'b':80,'m':60,'t':50,'s':40,'c':35,'e':30,'n':20};
+                    score+=bonusScore[e.type]||20;
+                }
+            }else if(player.invincible<=0){
+                hurt();
+            }
+        }
+    }
+    
+    const LW2=currentLevel.width,LH2=currentLevel.height;
+    for(let i=bullets.length-1;i>=0;i--){
+        const b=bullets[i];
+        
+        // 追踪弹逻辑
+        if(b.tracking&&b.life>0){
+            b.life--;
+            const targetAngle=Math.atan2(player.y+player.h/2-b.y,player.x+player.w/2-b.x);
+            const currentAngle=Math.atan2(b.vy,b.vx);
+            let angleDiff=targetAngle-currentAngle;
+            // 标准化角度差
+            while(angleDiff>Math.PI)angleDiff-=Math.PI*2;
+            while(angleDiff<-Math.PI)angleDiff+=Math.PI*2;
+            // 缓慢转向
+            const turnSpeed=0.05;
+            const newAngle=currentAngle+Math.sign(angleDiff)*Math.min(Math.abs(angleDiff),turnSpeed);
+            const speed=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+            b.vx=Math.cos(newAngle)*speed;
+            b.vy=Math.sin(newAngle)*speed;
+        }
+        
+        b.x+=b.vx;
+        b.y+=b.vy;
+        
+        if(b.x<-20||b.x>LW2+20||b.y<-20||b.y>LH2+20){bullets.splice(i,1);continue}
+        if(b.tracking&&b.life<=0){bullets.splice(i,1);continue}
+        
+        if(b.enemy&&player.invincible<=0&&player.x<b.x+6&&player.x+player.w>b.x-6&&player.y<b.y+6&&player.y+player.h>b.y-6){
+            hurt();
+            bullets.splice(i,1);
+            createParticles(b.x,b.y,'#f00',8);
+        }
+    }
+    
+    const g=currentLevel.goal;
+    // 只有终点未隐藏时才能通关
+    if(!g.hidden&&player.x<g.x+g.w&&player.x+player.w>g.x&&player.y<g.y+g.h&&player.y+player.h>g.y){
+        if(level<10){
+            level++;
+            initLevel(level);
+            createParticles(player.x+player.w/2,player.y+player.h/2,'#0f0',20);
+        }else{
+            win();
+        }
+    }
+}
+
+function hurt(){
+    lives--;
+    if(lives<=0){
+        gameState='over';
+        document.getElementById('fs').textContent=score;
+        document.getElementById('o').classList.remove('h');
+    }else{
+        player.invincible=90;
+        player.x=50;
+        player.y=currentLevel.height-150;
+        player.vx=0;
+        player.vy=0;
+        camX=0;
+        camY=currentLevel.height-VH;
+        // 重置碎裂平台
+        for(const p of crumblePlatforms){
+            p.crumbling=false;
+            p.gone=false;
+            p.timer=0;
+        }
+    }
+}
+
+function win(){
+    gameState='win';
+    document.getElementById('ws').textContent=score;
+    document.getElementById('w').classList.remove('h');
+}
+
+function loop(){if(gameState==='playing'){update();draw()}requestAnimationFrame(loop)}
+
+function g(){
+    document.getElementById('s').classList.add('h');
+    gameState='playing';
+    score=0;lives=3;level=1;
+    initLevel(1);
+    loop();
+}
+
+function r(){
+    document.getElementById('o').classList.add('h');
+    document.getElementById('w').classList.add('h');
+    gameState='playing';
+    score=0;lives=3;level=1;
+    initLevel(1);
+}
+
+let touchId=null,jumpId=null;
+canvas.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    const cp=getControlPos();
+    for(let t of e.changedTouches){
+        const tx=t.clientX,ty=t.clientY;
+        const d=Math.hypot(tx-cp.jsX,ty-cp.jsY);
+        if(d<cp.jsR+30&&touchId===null){
+            touchId=t.identifier;
+            js.active=true;
+            const angle=Math.atan2(ty-cp.jsY,tx-cp.jsX);
+            js.dx=Math.cos(angle);js.dy=Math.sin(angle);
+        }
+        const jd=Math.hypot(tx-cp.jbX,ty-cp.jbY);
+        if(jd<cp.jbR+30&&jumpId===null){
+            jumpId=t.identifier;
+            jb.pressed=true;
+        }
+    }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const cp=getControlPos();
+    for(let t of e.changedTouches){
+        if(t.identifier===touchId){
+            const tx=t.clientX,ty=t.clientY;
+            const angle=Math.atan2(ty-cp.jsY,tx-cp.jsX);
+            js.dx=Math.cos(angle);js.dy=Math.sin(angle);
+        }
+    }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+    e.preventDefault();
+    for(let t of e.changedTouches){
+        if(t.identifier===touchId){touchId=null;js.active=false;js.dx=0;js.dy=0}
+        if(t.identifier===jumpId){jumpId=null;jb.pressed=false}
+    }
+},{passive:false});
+
+function m(e){e.preventDefault();return false}
+canvas.addEventListener('gesturestart',m);
+canvas.addEventListener('gesturechange',m);
+canvas.addEventListener('gestureend',m);
+</script>
+</body>
+</html>
